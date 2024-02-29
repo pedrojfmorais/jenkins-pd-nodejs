@@ -11,9 +11,24 @@ node {
        sh 'npm test'
      }
    }
-   stage('docker build/push') {
-     docker.withRegistry('https://index.docker.io/v1/', 'dockerhub') {
-       def app = docker.build("ricardofilipe/docker-nodejs-demo:${commit_id}", '.').push()
+   stage('login to dockerhub') {
+      steps {
+                docker.withRegistry('https://index.docker.io/v1/', 'dockerhub') {
+                 def app = docker.login()
+               }
+            }
+   }
+   stage('docker build and push FE') {
+     when {
+                expression {
+                    return env.Component.contains('All') || env.Component.contains('Frontend') ;
+                }
      }
+     steps {
+        docker.withRegistry('https://index.docker.io/v1/', 'dockerhub') {
+         def app = docker.build("ricardofilipe/docker-nodejs-demo:${commit_id}", '-f Dockerfile.').push()
+       }
+     }
+     
    }
 }
