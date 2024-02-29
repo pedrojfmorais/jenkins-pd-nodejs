@@ -1,24 +1,4 @@
 pipeline {
-    agent {
-        label 'FOCUS-builds'
-    }
-    stages {
-      stage('Checkout repo on selected version') {
-            steps {
-                sh 'rm -rf repo_dir'
-                withCredentials([usernamePassword(credentialsId: 'acm', usernameVariable: 'svn_username', passwordVariable: 'svn_password')]) {
-                    sh 'svn checkout https://svn.ptin.corppt.com/repo/acm/$Version --username $svn_username --password "$svn_password" repo_dir'
-                }
-            }
-      }
-    
-
-    }
-
-}
-
-
-pipeline {
     agent any
     
     stages {
