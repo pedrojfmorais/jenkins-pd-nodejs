@@ -12,9 +12,6 @@ pipeline {
         }
         
         stage('test') {
-            agent {
-                label 'nodejs'
-            }
             steps {
                 script {
                     nodejs(nodeJSInstallationName: 'nodejs') {
