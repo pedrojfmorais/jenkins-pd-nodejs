@@ -31,6 +31,25 @@ pipeline {
                 }
             }
         }
+        stage('Build and Publish FE') {
+            when {
+                expression {
+                    return env.Component.contains('All') || env.Component.contains('Frontend') ;
+                }
+            }
+            steps {
+                dir('repo_dir') {
+                    script {
+                        sh '''
+                        image_name="ricardofilipe/docker-nodejs-demo:$Version"
+                        
+                        docker build -t $image_name -f Dockerfile .
+                        docker push image_name
+                        '''
+                    }
+                }
+            }
+        }
     }
 }
 
