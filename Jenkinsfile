@@ -43,15 +43,13 @@ pipeline {
                 }
             }
             steps {
-                dir('repo_dir') {
-                    script {
+                script {
                         sh '''
                         image_name="ricardofilipe/docker-nodejs-demo:$branchName"
                         
                         docker build -t $image_name -f Dockerfile .
                         docker push image_name
                         '''
-                    }
                 }
             }
         }
