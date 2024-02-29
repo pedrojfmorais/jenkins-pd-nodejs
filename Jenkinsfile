@@ -53,6 +53,23 @@ pipeline {
                 }
             }
         }
+        stage('Build and Publish BE') {
+            when {
+                expression {
+                    return env.Component.contains('All') || env.Component.contains('Backend') ;
+                }
+            }
+            steps {
+                script {
+                        sh '''
+                        image_name="ricardofilipe/docker-nodejs-demo-backend:$branchName"
+                        
+                        docker build -t $image_name -f Dockerfile .
+                        docker push $image_name
+                        '''
+                }
+            }
+        }
     }
 }
 
