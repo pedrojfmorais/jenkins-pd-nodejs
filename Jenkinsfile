@@ -1,34 +1,59 @@
-node {
-   def commit_id
-   stage('Preparation') {
-     checkout scm
-     sh "git rev-parse --short HEAD > .git/commit-id"                        
-     commit_id = readFile('.git/commit-id').trim()
-   }
-   stage('test') {
-     nodejs(nodeJSInstallationName: 'nodejs') {
-       sh 'npm install --only=dev'
-       sh 'npm test'
-     }
-   }
-   stage('login to dockerhub') {
-      steps {
-                docker.withRegistry('https://index.docker.io/v1/', 'dockerhub') {
-                 def app = docker.login()
-               }
-            }
-   }
-   stage('docker build and push FE') {
-     when {
-                expression {
-                    return env.Component.contains('All') || env.Component.contains('Frontend') ;
+pipeline {
+    agent {
+        label 'FOCUS-builds'
+    }
+    stages {
+      stage('Checkout repo on selected version') {
+            steps {
+                sh 'rm -rf repo_dir'
+                withCredentials([usernamePassword(credentialsId: 'acm', usernameVariable: 'svn_username', passwordVariable: 'svn_password')]) {
+                    sh 'svn checkout https://svn.ptin.corppt.com/repo/acm/$Version --username $svn_username --password "$svn_password" repo_dir'
                 }
-     }
-     steps {
-        docker.withRegistry('https://index.docker.io/v1/', 'dockerhub') {
-         def app = docker.build("ricardofilipe/docker-nodejs-demo:${commit_id}", '-f Dockerfile.').push()
-       }
-     }
-     
-   }
+            }
+      }
+    
+
+    }
+
 }
+
+
+pipeline {
+    agent any
+    
+    stages {
+        stage('Preparation') {
+            steps {
+                checkout scm
+                script {
+                    commit_id = sh(returnStdout: true, script: "git rev-parse --short HEAD").trim()
+                }
+            }
+        }
+        
+        stage('test') {
+            agent {
+                label 'nodejs'
+            }
+            steps {
+                script {
+                    nodejs(nodeJSInstallationName: 'nodejs') {
+                        sh 'npm install --only=dev'
+                        sh 'npm test'
+                    }
+                }
+            }
+        }
+        
+        stage('login to dockerhub') {
+            steps {
+                script {
+                    docker.withRegistry('https://index.docker.io/v1/', 'dockerhub') {
+                        def app = docker.login()
+                    }
+                }
+            }
+        }
+    }
+}
+
