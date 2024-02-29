@@ -1,6 +1,11 @@
 pipeline {
     agent any
     
+    environment {
+        branchName = Version.tokenize('/').last() //'refs/heads/main'
+    }
+
+
     stages {
         stage('Preparation') {
             steps {
@@ -41,7 +46,7 @@ pipeline {
                 dir('repo_dir') {
                     script {
                         sh '''
-                        image_name="ricardofilipe/docker-nodejs-demo:$Version"
+                        image_name="ricardofilipe/docker-nodejs-demo:$branchName"
                         
                         docker build -t $image_name -f Dockerfile .
                         docker push image_name
