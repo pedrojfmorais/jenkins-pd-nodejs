@@ -25,9 +25,9 @@ pipeline {
         stage('login to dockerhub') {
             steps {
                 script {
-                    docker.withRegistry('https://index.docker.io/v1/', 'dockerhub') {
-                        def app = docker.login()
-                    }
+                    withCredentials([usernamePassword(credentialsId: dockerhub, usernameVariable: 'docker_username', passwordVariable: 'docker_password')]) {
+                        sh "docker login https://index.docker.io/v1/ --username \"\$docker_username\" --password \"\$docker_password\""
+                    }                    
                 }
             }
         }
