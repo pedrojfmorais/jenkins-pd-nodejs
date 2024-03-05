@@ -45,7 +45,7 @@ pipeline {
             steps {
                 script {
                         sh '''
-                        image_name="ricardofilipe/docker-nodejs-demo:$branchName"
+                        image_name="\"\$docker_username\"/docker-nodejs-demo:$branchName"
                         
                         docker build -t $image_name -f Dockerfile .
                         docker push $image_name
@@ -62,7 +62,7 @@ pipeline {
             steps {
                 script {
                         sh '''
-                        image_name="ricardofilipe/docker-nodejs-demo-backend:$branchName"
+                        image_name="\"\$docker_username\"/docker-nodejs-demo-backend:$branchName"
                         
                         docker build -t $image_name -f Dockerfile .
                         docker push $image_name
