@@ -44,12 +44,14 @@ pipeline {
             }
             steps {
                 script {
+                    withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'docker_username', passwordVariable: 'docker_password')]) {
                         sh '''
                         image_name="\"\$docker_username\"/docker-nodejs-demo:$branchName"
                         
                         docker build -t $image_name -f Dockerfile .
                         docker push $image_name
                         '''
+                    } 
                 }
             }
         }
@@ -61,12 +63,14 @@ pipeline {
             }
             steps {
                 script {
+                    withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'docker_username', passwordVariable: 'docker_password')]) {
                         sh '''
                         image_name="\"\$docker_username\"/docker-nodejs-demo-backend:$branchName"
                         
                         docker build -t $image_name -f Dockerfile .
                         docker push $image_name
                         '''
+                    } 
                 }
             }
         }
